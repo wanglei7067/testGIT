@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace: 接口名 -->
+<mapper namespace="com.atguigu.gmall_publisher.dao.DAUMapper">
+
+    <!-- select标签代表下面是一个查询语句
+            id： 当前sql绑定方法名
+            resultType： 语句返回的结果映射的Java对象的类型
+
+            #{id}：   #{} 类似 ? ，占位符的作用
+
+                    如果一个sql语句中，只有一个占位符，#{xx}, xx可以随便写
+                    如果一个sql语句中，有多个占位符，且占位符从POJO对象中取出指定的属性，进行占位，
+                            #{xx}, xx写想取的属性名
+
+                   resultType中，常见的java的8大基本数据类型，都可以使用内置的别名
+                        Integer : int
+
+
+
+            当日新增如何求？
+                    正常：  hbase中有 每日新增设备表 new_mid_dayly
+
+                     目前：没有
+                            使用当天访问的设备  差集  历史访问的设备
+                            求出当日新访问的设备
+
+                           < 转义后 &lt;
+                           >  转义后 &gt;
+
+
+    -->
+    <select id="getDauByDate" resultType="int">
+       select
+            count(*)
+       from GMALL2020_DAU
+       where LOGDATE = #{date}
+   </select>
+
+  <select id="getNewMidCountByDate" resultType="int">
+
+        select
+            count(*)
+        from
+       ( select
+           MID
+       from GMALL2020_DAU
+       where LOGDATE = #{date} ) t1
+       left  join
+        ( select
+           MID
+       from GMALL2020_DAU
+       where LOGDATE &lt; #{date}
+        group by MID) t2
+        on t1.MID=t2.MID
+        where t2.MID is null
+
+  </select>
+
+    <select id="getDauPerHoursOfDay" resultType="com.atguigu.gmall_publisher.beans.DauPerHour">
+        select
+            LOGHOUR hour,
+            count(*) nums
+       from GMALL2020_DAU
+       where LOGDATE = #{date}
+       group by LOGHOUR
+    </select>
+
+
+</mapper>

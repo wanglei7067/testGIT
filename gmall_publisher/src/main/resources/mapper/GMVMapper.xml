@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace: 接口名 -->
+<mapper namespace="com.atguigu.gmall_publisher.dao.GMVMapper">
+
+
+    <select id="getGmvByDate" resultType="double">
+       select
+          sum(total_amount)
+       from gmall2020_order_info
+       where create_date = #{date}
+   </select>
+
+
+
+    <select id="getGmvPerHoursOfDay" resultType="com.atguigu.gmall_publisher.beans.GmvPerHour">
+        select
+            create_hour hour,
+            sum(total_amount) gmv
+       from gmall2020_order_info
+       where create_date = #{date}
+       group by create_hour
+    </select>
+
+
+</mapper>
